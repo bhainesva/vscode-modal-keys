@@ -46,21 +46,22 @@ do = ["modalkeys.enterNormal", "modalkeys.reset"]
 [[bind.modes.items]]
 key = ["escape", "ctrl+["]
 when = "suggestWidgetVisible && textInputFocus"
-do = ["moodalkeys.enterNormal", "modalkeys.reset"]
-
-[[bind.modes.items]]
-key = "i"
-mode = "normal"
-do = ["modalkeys.enterInsert", "modalkeys.reset"]
+do = ["modalkeys.enterNormal", "modalkeys.reset"]
 
 [[bind.modes.items]]
 # by default typing keys in a mode other than insert is simply ignored
 name = "ignore"
 description = "this key does nothing"
-key = "<all-keys>"
+key = ["<all-keys>", "shift+<all-keys>"]
 do.command = "modalkeys.ignore"
-mode = "!insert"
+allowed_prefixes = "<all-prefixes>"
+mode = ["!insert", "!search"]
 when = "editorTextFocus"
+
+[[bind.modes.items]]
+key = "i"
+mode = "normal"
+do = ["modalkeys.enterInsert", "modalkeys.reset"]
 
 [bind.edit]
 name = "Editor Commands"
@@ -69,7 +70,22 @@ Most commands are editing commands, they interact with the text editor, either b
 selecting text in the editor, moving around it, manipulating text in the editor, and
 so forth.
 """
-default.when = "editorTextFocus"
+default.when = "editorTextFocus && !findWidgetVisible"
+
+[bind.edit.count]
+name = "count"
+description = """
+The number keys are used to update the count, which affects how many times the next 
+command is repeated, when relevant.
+"""
+
+[[bind.edit.count.items]]
+name = "Update number with {key}"
+key = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+do.command = "modalkeys.updateCount"
+do.args.value = "{key}"
+resetTransient = false
+mode = "!insert" # number keys apply in all modes but insert
 
 [bind.edit.motion]
 name = "Motions"
@@ -108,3 +124,29 @@ key = "l"
 name = "→"
 description = "move right"
 do.args.to = "right"
+
+[bind.edit.motion.obj]
+name = "Motions around various regex-like objects"
+description = """
+selection commands that move by a predefined syntactic object (e.g. word, paragraph, etc...)
+"""
+default.do.command = "selection-utilities.moveBy"
+default.do.args.boundary = "start"
+default.allowed_prefixes = ["", "u"]
+default.do.computedArgs.select = "(select_on || editorHasSelection) && !around_on"
+default.do.computedArgs.selectWhole = "around_on"
+
+[[bind.edit.motion.obj.items]]
+key = "w"
+name = "subwrd →"
+description = "next subword (camel/snake case)"
+do.args.unit = "subword"
+do.computedArgs.value = "count"
+
+[[bind.edit.motion.obj.items]]
+key = "e"
+name = "subwrd end"
+description = "next subword (camel/snake case) end"
+do.args.unit = "subword"
+do.computedArgs.boundary = "around_on ? 'both' : 'end'"
+do.computedArgs.value = "count"

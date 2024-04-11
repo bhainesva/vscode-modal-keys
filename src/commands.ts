@@ -164,8 +164,29 @@ export function setKeyContext(args: SetArgs){
 }
 commands['modalkeys.set'] = setCmd;
 commands['modalkeys.setMode'] = (x) => setKeyContext({name: 'mode', value: 'insert', transient: false});
-commands['modalkeys.enterInsert'] = (x) => setKeyContext({name: 'mode', value: 'insert', transient: false});
-commands['modalkeys.enterNormal'] = (x) => setKeyContext({name: 'mode', value: 'normal', transient: false});
+commands['modalkeys.enterInsert'] = (x) => {
+    const colorCustomizations: any = vscode.workspace.getConfiguration().get('workbench.colorCustomizations');
+    colorCustomizations['editorCursor.foreground'] = '#ddbb88';
+    vscode.workspace.getConfiguration()
+    .update(
+        'workbench.colorCustomizations',
+         colorCustomizations,
+    );
+
+    setKeyContext({name: 'mode', value: 'insert', transient: false});
+}
+
+commands['modalkeys.enterNormal'] = (x) => {
+    const colorCustomizations: any = vscode.workspace.getConfiguration().get('workbench.colorCustomizations');
+    colorCustomizations['editorCursor.foreground'] = '#dd88c2';
+    vscode.workspace.getConfiguration()
+    .update(
+        'workbench.colorCustomizations',
+         colorCustomizations,
+    );
+
+    setKeyContext({name: 'mode', value: 'normal', transient: false});
+}
 
 function reset(){
     // clear any relevant state

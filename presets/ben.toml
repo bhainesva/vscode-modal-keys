@@ -19,6 +19,7 @@ required_extensions = [
 
 [bind]
 name = "Ben's Key Bindings"
+
 description = """
 Keybindings for Ben :)
 """
@@ -41,6 +42,7 @@ return to insert mode.
 name = "normal"
 description = "Enter normal mode"
 key = ["escape", "ctrl+["]
+when = "editorTextFocus && !findWidgetVisible"
 do = ["modalkeys.enterNormal", "modalkeys.reset"]
 
 [[bind.modes.items]]
@@ -56,12 +58,35 @@ key = ["<all-keys>", "shift+<all-keys>"]
 do.command = "modalkeys.ignore"
 allowed_prefixes = "<all-prefixes>"
 mode = ["!insert", "!search"]
-when = "editorTextFocus"
+when = "editorTextFocus && !findWidgetVisible"
 
 [[bind.modes.items]]
 key = "i"
-mode = "normal"
-do = ["modalkeys.enterInsert", "modalkeys.reset"]
+mode = ["normal"]
+do = ["selection-utilities.shrinkToActive", "modalkeys.enterInsert", "modalkeys.reset"]
+when = "editorTextFocus"
+
+[[bind.modes.items]]
+key = 'shift+a'
+mode = 'normal'
+do = ["selection-utilities.splitByNewline", { command = "cursorMove", args = { to = "wrappedLineEnd", select = false } }, "modalkeys.enterInsert", "modalkeys.reset"]
+
+[[bind.modes.items]]
+key = 'shift+i'
+mode = 'normal'
+do = [ { command = "cursorMove", args = { to = "wrappedLineStart", select = false } }, "modalkeys.enterInsert", "modalkeys.reset"]
+
+[[bind.modes.items]]
+key = 'o'
+mode = 'normal'
+do = ["editor.action.insertLineAfter", "modalkeys.enterInsert"]
+when = "editorTextFocus"
+
+[[bind.modes.items]]
+key = 'shift+o'
+mode = 'normal'
+do = ["editor.action.insertLineBefore", "modalkeys.enterInsert"]
+when = "editorTextFocus"
 
 [bind.edit]
 name = "Editor Commands"
@@ -70,7 +95,50 @@ Most commands are editing commands, they interact with the text editor, either b
 selecting text in the editor, moving around it, manipulating text in the editor, and
 so forth.
 """
-default.when = "editorTextFocus && !findWidgetVisible"
+default.when = "editorTextFocus"
+
+[bind.edit.motion.mod]
+name = "Modify Motion Effects"
+description = "Keys that change how other motions work"
+kind = "select"
+
+[[bind.edit.motion.mod.items]]
+key = "v"
+name = "hold selection"
+description = """
+selection commands extend the selection
+"""
+do.command = "modalkeys.set"
+do.args.name = "select_on"
+do.computedArgs.value = "!select_on"
+
+[[bind.edit.motion.mod.items]]
+key = "alt+;"
+name = "swap anchors"
+description = """
+switches the start and end anchors of current selections
+"""
+do.command = "selection-utilities.exchangeAnchorActive"
+
+[[bind.edit.motion.mod.items]]
+key = "r"
+name = "shrink selection"
+description = """
+reduce all selections to length zero
+"""
+mode = ["!insert"]
+when = "editorHasSelection"
+do = ["selection-utilities.shrinkToActive", { command = "modalkeys.set", args = { name = "select_on", value = false } }]
+
+[[bind.edit.motion.mod.items]]
+key = "r"
+name = "shrink selection"
+description = """
+reduce all selections to length zero
+"""
+mode = ["!insert"]
+when = "!editorHasSelection"
+do = "removeSecondaryCursors"
 
 [bind.edit.count]
 name = "count"
@@ -98,7 +166,6 @@ name = "Primitive Motions"
 description = "Motions fundamental to moving around in the editor."
 default.do.command = "cursorMove"
 default.do.computedArgs.value = "count"
-default.do.computedArgs.around = "around_on"
 default.do.computedArgs.select = "select_on"
 
 [[bind.edit.motion.prim.items]]
@@ -125,6 +192,61 @@ name = "→"
 description = "move right"
 do.args.to = "right"
 
+[[bind.edit.motion.prim.items]]
+key = "x"
+name = "expand to line"
+description = "expand selection to full line"
+mode = ["!insert"]
+do = ["expandLineSelection", { command = "modalkeys.set", args = {name = "select_on", value = true}}]
+
+[bind.edit.motion.context]
+name = "Contextual motions"
+description = "Smart selection of objects by context"
+
+[[bind.edit.motion.context.items]]
+key = "["
+do = "bracketeer.selectBracketContent"
+
+[[bind.edit.motion.context.items]]
+key = "'"
+do = "bracketeer.selectQuotesContent"
+
+[[bind.edit.motion.context.items]]
+key = "u u"
+name = "smart expand"
+description = "Use VSCode's built-in smart expansion command"
+do.command = "editor.action.smartSelect.expand"
+
+[[bind.edit.motion.context.items]]
+key = "u shift+,"
+name = "select in tag"
+description = "Select contents of html tag"
+do.command = "extension.selectInTag"
+
+[[bind.edit.motion.context.items]]
+key = "s enter"
+name = "split \\n"
+when = "editorHasSelection"
+mode = ["!insert"]
+description = "Split the current selection on newlines"
+do.command = "selection-utilities.splitByNewline"
+
+[[bind.edit.motion.context.items]]
+key = "s s"
+name = "split \\n"
+when = "editorHasSelection"
+mode = ["!insert"]
+description = "Split the current selection by user input"
+do.command = "selection-utilities.createByRegex"
+
+[[bind.edit.motion.context.items]]
+key = "s shift+s"
+name = "split \\n"
+when = "editorHasSelection"
+mode = ["!insert"]
+description = "Split the current selection by user input"
+do.command = "selection-utilities.splitByRegex"
+
 [bind.edit.motion.obj]
 name = "Motions around various regex-like objects"
 description = """
@@ -132,21 +254,195 @@ selection commands that move by a predefined syntactic object (e.g. word, paragr
 """
 default.do.command = "selection-utilities.moveBy"
 default.do.args.boundary = "start"
-default.allowed_prefixes = ["", "u"]
-default.do.computedArgs.select = "(select_on || editorHasSelection) && !around_on"
-default.do.computedArgs.selectWhole = "around_on"
+default.do.computedArgs.select = "select_on"
+default.do.computedArgs.selectWhole = "!select_on"
 
 [[bind.edit.motion.obj.items]]
 key = "w"
 name = "subwrd →"
 description = "next subword (camel/snake case)"
 do.args.unit = "subword"
-do.computedArgs.value = "count"
+do.args.value = 1
 
 [[bind.edit.motion.obj.items]]
 key = "e"
 name = "subwrd end"
 description = "next subword (camel/snake case) end"
 do.args.unit = "subword"
+do.args.boundary = "end"
+
+[[bind.edit.motion.obj.items]]
+key = "shift+w"
+name = "word →"
+description = "next word"
+do.args.unit = "word"
+
+[[bind.edit.motion.obj.items]]
+key = "shift+e"
+name = "word end"
+description = "next word end"
+do.args.unit = "word"
 do.computedArgs.boundary = "around_on ? 'both' : 'end'"
-do.computedArgs.value = "count"
+
+[[bind.edit.motion.obj.items]]
+key = "b"
+name = "subwrd →"
+description = "next subword (camel/snake case)"
+do.args.unit = "subword"
+do.args.value = -1
+
+[[bind.edit.motion.obj.items]]
+key = "p"
+name = "paragraph →"
+description = "next paragraph"
+do.args.unit = "paragraph"
+do.args.value = 1
+
+[[bind.edit.motion.obj.items]]
+key = "shift+p"
+name = "paragraph →"
+description = "previous paragraph"
+do.args.unit = "paragraph"
+do.args.value = -1
+
+[[bind.edit.motion.obj.items]]
+key = "g"
+name = "start of file"
+description = "move to start of file"
+
+[bind.edit.action]
+name = "Actions"
+description = "Commands that modify the document or UI"
+kind = "action"
+default.mode = "normal"
+
+[bind.edit.action.basic]
+name = "Basic Actions"
+description = "Essential actions required to edit text"
+
+[[bind.edit.action.basic.items]]
+key = "d"
+name = "delete"
+description = """
+Without a count: delete selected text (and store to clipboard). With a 
+count, delete up to the next `count` lines and store to clipboard.
+"""
+when = "!editorHasSelection"
+do = "editor.action.deleteLines"
+
+[[bind.edit.action.basic.items]]
+key = "d"
+when = "editorHasSelection"
+do = ["editor.action.clipboardCutAction", "modalkeys.enterNormal"]
+
+[[bind.edit.action.basic.items]]
+key = "c"
+when = "editorHasSelection"
+do = ["editor.action.clipboardCutAction", "modalkeys.enterInsert"]
+
+
+[[bind.edit.action.basic.items]]
+key = "y"
+name = "yank"
+description = "yank selected text, or line if there's no selection"
+when = "editorHasSelection"
+mode = ["!insert"]
+do = ["editor.action.clipboardCopyAction", "modalkeys.enterNormal"]
+
+[[bind.edit.action.basic.items]]
+key = "y"
+when = "!editorHasSelection"
+mode = ["!insert"]
+do = ["expandLineSelection", "editor.action.clipboardCopyAction", "selection-utilities.shrinkToActive", "modalkeys.enterNormal"]
+
+[[bind.edit.action.basic.items]]
+key = "shift+,"
+mode = ["normal"]
+do = ["editor.action.outdentLines"]
+
+[[bind.edit.action.basic.items]]
+key = "shift+."
+mode = ["normal"]
+do = ["editor.action.indentLines"]
+
+[bind.edit.motion.search]
+name = "Search Related Motions"
+description = "Motions related to searching for text in a document"
+default.do.command = "modalkeys.search"
+default.do.args.caseSensitive = true
+default.do.args.backwards = false
+default.do.args.selectTillMatch = true
+default.do.args.wrapAround = true
+
+[[bind.edit.motion.search.items]]
+key = "/"
+name = "search"
+description = "search forwards"
+do.args.register = "search"
+
+[[bind.edit.motion.search.items]]
+key = "n"
+name = "→ search"
+description = "Go to the next match of the search query"
+do.command = "modalkeys.nextMatch"
+do.args.register = "search"
+
+[[bind.edit.motion.search.items]]
+key = "shift+n"
+name = "← search"
+description = "Go to the previous match of the search query"
+do.command = "modalkeys.previousMatch"
+do.args.register = "search"
+
+[[bind.edit.motion.search.items]]
+key = "f"
+name = "find char"
+description = "Find the next char (include char in selection)"
+do.args.acceptAfter = 1
+do.computedArgs.skip = "count-1"
+
+[[bind.edit.motion.search.items]]
+key = "shift+f"
+name = "find char back"
+description = "Find the previous char (include char in selection)"
+do.args.acceptAfter = 1
+do.args.backwards = true
+do.computedArgs.skip = "count-1"
+
+[bind.go]
+name = "go to"
+description = "commands related to navigation to absolute reference points"
+default.mode = "!insert"
+default.when = "editorTextFocus"
+
+[[bind.go.items]]
+key = 'g t'
+name = "tab →"
+description = """
+show next editor tab
+"""
+do = 'workbench.action.nextEditor'
+
+[[bind.go.items]]
+key = 'g shift+t'
+name = "tab ←"
+description = """
+show previous editor tab
+"""
+do = 'workbench.action.previousEditor'
+
+[[bind.go.items]]
+name = "start of file"
+description = """
+move cursor to start of file
+"""
+key = "g g"
+do = "cursorTopSelect"
+
+[[bind.go.items]]
+name = "end of file"
+description = """
+move cursor to end of file
+"""
+key = "g shift+g"
+do = "cursorBottomSelect"

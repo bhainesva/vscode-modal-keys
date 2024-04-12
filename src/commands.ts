@@ -73,7 +73,6 @@ class CommandState {
 export let state = new CommandState();
 
 async function runCommand(command: StrictDoArg){
-    console.log("Running command: ", command);
     if(typeof command === 'string'){
         vscode.commands.executeCommand(command);
     }else{

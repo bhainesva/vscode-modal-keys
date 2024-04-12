@@ -24,6 +24,15 @@ description = """
 Keybindings for Ben :)
 """
 
+[bind.edit]
+name = "Editor Commands"
+description = """
+Most commands are editing commands, they interact with the text editor, either by
+selecting text in the editor, moving around it, manipulating text in the editor, and
+so forth.
+"""
+default.when = "editorTextFocus"
+
 [bind.modes]
 name = "Modes"
 description = """
@@ -87,15 +96,6 @@ key = 'shift+o'
 mode = 'normal'
 do = ["editor.action.insertLineBefore", "modalkeys.enterInsert"]
 when = "editorTextFocus"
-
-[bind.edit]
-name = "Editor Commands"
-description = """
-Most commands are editing commands, they interact with the text editor, either by
-selecting text in the editor, moving around it, manipulating text in the editor, and
-so forth.
-"""
-default.when = "editorTextFocus"
 
 [bind.edit.motion.mod]
 name = "Modify Motion Effects"

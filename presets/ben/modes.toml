@@ -1,0 +1,63 @@
+[bind.modes]
+name = "Modes"
+description = """
+Larkin uses different modes (like vim). Insert is the default and it 
+works the same way VSCode normally does. Upon hitting escape you enter normal
+mode, wherein a variety of behaviors are available to move around and manipulate the
+text.
+
+Refer to the actions section for the various ways you can exit normal mode and
+return to insert mode.
+
+**TODO**: document the other modes
+"""
+
+[[bind.modes.items]]
+name = "normal"
+description = "Enter normal mode"
+key = ["escape", "ctrl+["]
+when = "editorTextFocus && !findWidgetVisible"
+do = ["modalkeys.enterNormal", "modalkeys.reset"]
+
+[[bind.modes.items]]
+key = ["escape", "ctrl+["]
+when = "suggestWidgetVisible && textInputFocus"
+do = ["modalkeys.enterNormal", "modalkeys.reset"]
+
+[[bind.modes.items]]
+# by default typing keys in a mode other than insert is simply ignored
+name = "ignore"
+description = "this key does nothing"
+key = ["<all-keys>", "shift+<all-keys>"]
+do.command = "modalkeys.ignore"
+allowed_prefixes = "<all-prefixes>"
+mode = ["!insert", "!search"]
+when = "editorTextFocus && !findWidgetVisible"
+
+[[bind.modes.items]]
+key = "i"
+mode = ["normal"]
+do = ["selection-utilities.shrinkToActive", "modalkeys.enterInsert", "modalkeys.reset"]
+when = "editorTextFocus"
+
+[[bind.modes.items]]
+key = 'shift+a'
+mode = 'normal'
+do = ["selection-utilities.splitByNewline", { command = "cursorMove", args = { to = "wrappedLineEnd", select = false } }, "modalkeys.enterInsert", "modalkeys.reset"]
+
+[[bind.modes.items]]
+key = 'shift+i'
+mode = 'normal'
+do = [ { command = "cursorMove", args = { to = "wrappedLineStart", select = false } }, "modalkeys.enterInsert", "modalkeys.reset"]
+
+[[bind.modes.items]]
+key = 'o'
+mode = 'normal'
+do = ["editor.action.insertLineAfter", "modalkeys.enterInsert"]
+when = "editorTextFocus"
+
+[[bind.modes.items]]
+key = 'shift+o'
+mode = 'normal'
+do = ["editor.action.insertLineBefore", "modalkeys.enterInsert"]
+when = "editorTextFocus"

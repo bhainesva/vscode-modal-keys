@@ -4,6 +4,8 @@ import * as semver from 'semver';
 import { TextDecoder } from 'util';
 import { ZodIssue, preprocess, z } from "zod";
 import { ZodError, fromZodError, fromZodIssue } from 'zod-validation-error';
+import { merge } from 'lodash';
+
 
 let decoder = new TextDecoder("utf-8");
 
@@ -111,7 +113,7 @@ export const bindingItem = z.object({
     mode: z.union([z.string(), z.string().array()]).optional(),
     allowed_prefixes: z.union([
         z.string().refine(x => {
-            return x === "<all-prefixes>"
+            return x === "<all-prefixes>";
         }, prefixError), 
         z.union([bindingKey, z.string().max(0)]).array()
     ]).optional(),
@@ -179,7 +181,25 @@ export const bindingSpec = z.object({
 });
 export type BindingSpec = z.infer<typeof bindingSpec>;
 
-export async function parseBindingFile(file: vscode.Uri){
+export async function parseBindingFileOrDirectory(file: vscode.Uri){
+    let stat = await vscode.workspace.fs.stat(file);
+
+    if (stat.type === vscode.FileType.Directory) {
+        // TODO: make this recursive
+        const subfiles = await vscode.workspace.fs.readDirectory(file);
+        const fileContents = await Promise.all(subfiles.map(async (subfile) => {
+            const file_data = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(file, subfile[0]));
+            const file_text = decoder.decode(file_data);
+            if (file.fsPath.endsWith(".json")) {
+              return JSON.parse(file_text);
+            } else {
+              return TOML.load(file_text);
+            }
+        }));
+
+        return bindingSpec.safeParse(fileContents.reduce((allBindings, sub_config) => merge(allBindings, sub_config), {}));
+    }
+    
     let file_data = await vscode.workspace.fs.readFile(file);
     let file_text = decoder.decode(file_data);
     if(file.fsPath.endsWith(".json")){

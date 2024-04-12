@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { searchMatches } from './searching';
-import { BindingItem, parseBindingFile, showParseError } from './keybindingParsing';
+import { BindingItem, parseBindingFileOrDirectory, showParseError } from './keybindingParsing';
 import { processBindings } from './keybindingProcessing';
 import { pick } from 'lodash';
 
@@ -72,7 +72,7 @@ async function insertKeybindingsIntoConfig(file: vscode.Uri, config: any) {
         if (!bracket) {
             vscode.window.showErrorMessage("Could not find opening `[` at top of " +
                 "keybindings file. Your keybinding file does not appear to be " +
-                "proplery formatted.");
+                "properlry formatted.");
             return;
         } else {
             let insert_at = bracket.end;
@@ -125,7 +125,7 @@ async function queryBindingFile() {
         openLabel: "Import Modal-Key-Binding Spec",
         filters: { Preset: ["json", "toml"] },
         canSelectFiles: true,
-        canSelectFolders: false,
+        canSelectFolders: true,
         canSelectMany: false
     });
     if(!file || file.length !== 1) { return undefined; }
@@ -135,7 +135,7 @@ async function queryBindingFile() {
 async function importBindings() {
     let file = await queryBindingFile();
     if (file === undefined) { return; }
-    let parsedBindings = await parseBindingFile(file);
+    let parsedBindings = await parseBindingFileOrDirectory(file);
     if(parsedBindings.success){
         let bindings = processBindings(parsedBindings.data);
         insertKeybindingsIntoConfig(file, bindings);

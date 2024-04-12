@@ -32,7 +32,7 @@
         "statusBar.debuggingForeground": "#FFFFFF",
         "tab.activeBorder": "#e81457",
         "iLoveWorkSpaceColors": true,
-        "iLoveWorkSpaceRandom": false
+        "iLoveWorkSpaceRandom": false,
+        "editorCursor.foreground": "#dd88c2"
     }
-    
 }

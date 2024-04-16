@@ -1,12 +1,3 @@
-[bind.edit]
-name = "Editor Commands"
-description = """
-Most commands are editing commands, they interact with the text editor, either by
-selecting text in the editor, moving around it, manipulating text in the editor, and
-so forth.
-"""
-default.when = "editorTextFocus"
-
 [bind.edit.motion.mod]
 name = "Modify Motion Effects"
 description = "Keys that change how other motions work"
@@ -21,34 +12,6 @@ selection commands extend the selection
 do.command = "modalkeys.set"
 do.args.name = "select_on"
 do.computedArgs.value = "!select_on"
-
-[[bind.edit.motion.mod.items]]
-key = "alt+;"
-name = "swap anchors"
-description = """
-switches the start and end anchors of current selections
-"""
-do.command = "selection-utilities.exchangeAnchorActive"
-
-[[bind.edit.motion.mod.items]]
-key = "r"
-name = "shrink selection"
-description = """
-reduce all selections to length zero
-"""
-mode = ["!insert"]
-when = "editorHasSelection"
-do = ["selection-utilities.shrinkToActive", { command = "modalkeys.set", args = { name = "select_on", value = false } }]
-
-[[bind.edit.motion.mod.items]]
-key = "r"
-name = "shrink selection"
-description = """
-reduce all selections to length zero
-"""
-mode = ["!insert"]
-when = "!editorHasSelection"
-do = "removeSecondaryCursors"
 
 [bind.edit.count]
 name = "count"
@@ -85,6 +48,22 @@ description = "move left"
 do.args.to = "left"
 
 [[bind.edit.motion.prim.items]]
+key = "shift+h"
+name = "←←"
+mode = ["normal"]
+when = "modalkeys.select_on"
+description = "move to start of line"
+do = "cursorHomeSelect"
+
+[[bind.edit.motion.prim.items]]
+key = "shift+h"
+name = "←←"
+mode = ["normal"]
+when = "!modalkeys.select_on"
+description = "move to start of line"
+do = "cursorHome"
+
+[[bind.edit.motion.prim.items]]
 key = "j"
 name = "↓"
 description = "move down"
@@ -99,8 +78,23 @@ do.args.to = "up"
 [[bind.edit.motion.prim.items]]
 key = "l"
 name = "→"
+mode = ["normal"]
 description = "move right"
 do.args.to = "right"
+
+[[bind.edit.motion.prim.items]]
+key = "shift+l"
+name = "→→"
+description = "move to end of line"          
+when = "!modalkeys.select_on"
+do = "cursorEnd"
+
+[[bind.edit.motion.prim.items]]
+key = "shift+l"
+name = "→→"
+description = "move to end of line"
+when = "modalkeys.select_on"
+do = "cursorEndSelect"
 
 [[bind.edit.motion.prim.items]]
 key = "x"
@@ -132,30 +126,6 @@ key = "u shift+,"
 name = "select in tag"
 description = "Select contents of html tag"
 do.command = "extension.selectInTag"
-
-[[bind.edit.motion.context.items]]
-key = "s enter"
-name = "split \\n"
-when = "editorHasSelection"
-mode = ["!insert"]
-description = "Split the current selection on newlines"
-do.command = "selection-utilities.splitByNewline"
-
-[[bind.edit.motion.context.items]]
-key = "s s"
-name = "split \\n"
-when = "editorHasSelection"
-mode = ["!insert"]
-description = "Split the current selection by user input"
-do.command = "selection-utilities.createByRegex"
-
-[[bind.edit.motion.context.items]]
-key = "s shift+s"
-name = "split \\n"
-when = "editorHasSelection"
-mode = ["!insert"]
-description = "Split the current selection by user input"
-do.command = "selection-utilities.splitByRegex"
 
 [bind.edit.motion.obj]
 name = "Motions around various regex-like objects"
@@ -216,66 +186,6 @@ description = "previous paragraph"
 do.args.unit = "paragraph"
 do.args.value = -1
 
-[[bind.edit.motion.obj.items]]
-key = "g"
-name = "start of file"
-description = "move to start of file"
-
-[bind.edit.action]
-name = "Actions"
-description = "Commands that modify the document or UI"
-kind = "action"
-default.mode = "normal"
-
-[bind.edit.action.basic]
-name = "Basic Actions"
-description = "Essential actions required to edit text"
-
-[[bind.edit.action.basic.items]]
-key = "d"
-name = "delete"
-description = """
-Without a count: delete selected text (and store to clipboard). With a 
-count, delete up to the next `count` lines and store to clipboard.
-"""
-when = "!editorHasSelection"
-do = "editor.action.deleteLines"
-
-[[bind.edit.action.basic.items]]
-key = "d"
-when = "editorHasSelection"
-do = ["editor.action.clipboardCutAction", "modalkeys.enterNormal"]
-
-[[bind.edit.action.basic.items]]
-key = "c"
-when = "editorHasSelection"
-do = ["editor.action.clipboardCutAction", "modalkeys.enterInsert"]
-
-
-[[bind.edit.action.basic.items]]
-key = "y"
-name = "yank"
-description = "yank selected text, or line if there's no selection"
-when = "editorHasSelection"
-mode = ["!insert"]
-do = ["editor.action.clipboardCopyAction", "modalkeys.enterNormal"]
-
-[[bind.edit.action.basic.items]]
-key = "y"
-when = "!editorHasSelection"
-mode = ["!insert"]
-do = ["expandLineSelection", "editor.action.clipboardCopyAction", "selection-utilities.shrinkToActive", "modalkeys.enterNormal"]
-
-[[bind.edit.action.basic.items]]
-key = "shift+,"
-mode = ["normal"]
-do = ["editor.action.outdentLines"]
-
-[[bind.edit.action.basic.items]]
-key = "shift+."
-mode = ["normal"]
-do = ["editor.action.indentLines"]
-
 [bind.edit.motion.search]
 name = "Search Related Motions"
 description = "Motions related to searching for text in a document"
@@ -319,41 +229,3 @@ description = "Find the previous char (include char in selection)"
 do.args.acceptAfter = 1
 do.args.backwards = true
 do.computedArgs.skip = "count-1"
-
-[bind.go]
-name = "go to"
-description = "commands related to navigation to absolute reference points"
-default.mode = "!insert"
-default.when = "editorTextFocus"
-
-[[bind.go.items]]
-key = 'g t'
-name = "tab →"
-description = """
-show next editor tab
-"""
-do = 'workbench.action.nextEditor'
-
-[[bind.go.items]]
-key = 'g shift+t'
-name = "tab ←"
-description = """
-show previous editor tab
-"""
-do = 'workbench.action.previousEditor'
-
-[[bind.go.items]]
-name = "start of file"
-description = """
-move cursor to start of file
-"""
-key = "g g"
-do = "cursorTopSelect"
-
-[[bind.go.items]]
-name = "end of file"
-description = """
-move cursor to end of file
-"""
-key = "g shift+g"
-do = "cursorBottomSelect"

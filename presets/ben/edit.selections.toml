@@ -1,0 +1,72 @@
+[bind.edit.motion.selections]
+name = "Selection Manipulation Effects"
+description = "Keys that manipulate the current selection in complex ways"
+kind = "select"
+
+[[bind.edit.motion.selections.items]]
+key = "alt+;"
+name = "swap anchors"
+description = """
+switches the start and end anchors of current selections
+"""
+do.command = "selection-utilities.exchangeAnchorActive"
+
+[[bind.edit.motion.selections.items]]
+key = "r"
+name = "shrink selection"
+description = """
+reduce all selections to length zero
+"""
+mode = ["!insert"]
+when = "editorHasSelection"
+do = ["selection-utilities.shrinkToActive", { command = "modalkeys.set", args = { name = "select_on", value = false } }]
+
+[[bind.edit.motion.selections.items]]
+key = "r"
+name = "shrink selection"
+description = """
+reduce all selections to length zero
+"""
+mode = ["!insert"]
+when = "!editorHasSelection"
+do = "removeSecondaryCursors"
+
+[[bind.edit.motion.selections.items]]
+key = "s c"
+name = "create regex"
+when = "editorHasSelection"
+mode = ["!insert"]
+description = "create sub-selections by user input"
+do.command = "selection-utilities.createByRegex"
+
+[[bind.edit.motion.selections.items]]
+key = "s s"
+name = "split regex"
+when = "editorHasSelection"
+mode = ["!insert"]
+description = "Split the current selection by user input"
+do.command = "selection-utilities.splitByRegex"
+
+[[bind.edit.motion.selections.items]]
+key = "s x"
+name = "exclude regex"
+when = "editorHasSelection"
+mode = ["!insert"]
+description = "exclude selections by user input"
+do.command = "selection-utilities.excludeByRegex"
+
+[[bind.edit.motion.selections.items]]
+key = "s f"
+name = "filter regex"
+when = "editorHasSelection"
+mode = ["!insert"]
+description = "filter the current selections by user input"
+do.command = "selection-utilities.includeByRegex"
+
+[[bind.edit.motion.selections.items]]
+key = "enter"
+name = "split \\n"
+when = "editorHasSelection"
+mode = ["!insert"]
+description = "Split the current selection on newlines"
+do.command = "selection-utilities.splitByNewline"

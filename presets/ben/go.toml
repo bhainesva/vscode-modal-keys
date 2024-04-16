@@ -1,0 +1,37 @@
+[bind.go]
+name = "go to"
+description = "commands related to navigation to absolute reference points"
+default.mode = "!insert"
+default.when = "editorTextFocus"
+
+[[bind.go.items]]
+key = 'g t'
+name = "tab →"
+description = """
+show next editor tab
+"""
+do = 'workbench.action.nextEditor'
+
+[[bind.go.items]]
+key = 'g shift+t'
+name = "tab ←"
+description = """
+show previous editor tab
+"""
+do = 'workbench.action.previousEditor'
+
+[[bind.go.items]]
+name = "start of file"
+description = """
+move cursor to start of file
+"""
+key = "g g"
+do = "cursorTopSelect"
+
+[[bind.go.items]]
+name = "end of file"
+description = """
+move cursor to end of file
+"""
+key = "g e"
+do = "cursorBottomSelect"

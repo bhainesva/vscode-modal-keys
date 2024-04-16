@@ -23,33 +23,3 @@ do = ["modalkeys.enterNormal", "modalkeys.reset"]
 key = ["escape", "ctrl+["]
 when = "suggestWidgetVisible && textInputFocus"
 do = ["modalkeys.enterNormal", "modalkeys.reset"]
-
-[[bind.modes.items]]
-key = "i"
-mode = ["normal"]
-do = ["selection-utilities.shrinkToActive", "modalkeys.enterInsert", "modalkeys.reset"]
-when = "editorTextFocus"
-
-[[bind.modes.items]]
-name = '$ and insert'
-description = "move cursor to the end of the current line(s) and enter insert mode"
-key = 'shift+a'
-mode = 'normal'
-do = ['expandLineSelection', 'editor.action.insertCursorAtEndOfEachLineSelected', 'modalkeys.enterInsert', 'modalkeys.reset']
-
-[[bind.modes.items]]
-key = 'shift+i'
-mode = 'normal'
-do = ['expandLineSelection', 'editor.action.insertCursorAtEndOfEachLineSelected', {command="cursorMove", args={to="wrappedLineFirstNonWhitespaceCharacter"}}, "modalkeys.enterInsert", "modalkeys.reset"]
-
-[[bind.modes.items]]
-key = 'o'
-mode = 'normal'
-do = ["editor.action.insertLineAfter", "modalkeys.enterInsert"]
-when = "editorTextFocus"
-
-[[bind.modes.items]]
-key = 'shift+o'
-mode = 'normal'
-do = ["editor.action.insertLineBefore", "modalkeys.enterInsert"]
-when = "editorTextFocus"

@@ -1,0 +1,8 @@
+[bind.edit]
+name = "Editor Commands"
+description = """
+Most commands are editing commands, they interact with the text editor, either by
+selecting text in the editor, moving around it, manipulating text in the editor, and
+so forth.
+"""
+default.when = "editorTextFocus"

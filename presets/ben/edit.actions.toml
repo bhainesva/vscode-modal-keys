@@ -1,0 +1,77 @@
+[bind.edit.action]
+name = "Actions"
+description = "Commands that modify the document or UI"
+kind = "action"
+default.mode = "normal"
+
+[bind.edit.action.basic]
+name = "Basic Actions"
+description = "Essential actions required to edit text"
+
+[[bind.edit.action.basic.items]]
+key = "d"
+name = "delete"
+description = """
+Without a count: delete selected text (and store to clipboard). With a 
+count, delete up to the next `count` lines and store to clipboard.
+"""
+when = "!editorHasSelection"
+do = "editor.action.clipboardCutAction"
+
+[[bind.edit.action.basic.items]]
+key = "d"
+when = "editorHasSelection"
+do = ["editor.action.clipboardCutAction", "modalkeys.enterNormal"]
+
+[[bind.edit.action.basic.items]]
+key = "c"
+when = "editorHasSelection"
+do = ["editor.action.clipboardCutAction", "modalkeys.enterInsert"]
+
+
+[[bind.edit.action.basic.items]]
+key = "y"
+name = "yank"
+description = "yank selected text, or line if there's no selection"
+mode = ["!insert"]
+do = ["editor.action.clipboardCopyAction", "modalkeys.enterNormal"]
+
+[[bind.edit.action.basic.items]]
+key = "shift+,"
+mode = ["normal"]
+do = ["editor.action.outdentLines"]
+
+[[bind.edit.action.basic.items]]
+key = "shift+."
+mode = ["normal"]
+do = ["editor.action.indentLines"]
+
+[[bind.edit.action.basic.items]]
+key = "i"
+mode = ["normal"]
+do = ["selection-utilities.shrinkToActive", "modalkeys.enterInsert", "modalkeys.reset"]
+when = "editorTextFocus"
+
+[[bind.edit.action.basic.items]]
+name = '$ and insert'
+description = "move cursor to the end of the current line(s) and enter insert mode"
+key = 'shift+a'
+mode = 'normal'
+do = ['expandLineSelection', 'editor.action.insertCursorAtEndOfEachLineSelected', 'modalkeys.enterInsert', 'modalkeys.reset']
+
+[[bind.edit.action.basic.items]]
+key = 'shift+i'
+mode = 'normal'
+do = ['expandLineSelection', 'editor.action.insertCursorAtEndOfEachLineSelected', {command="cursorMove", args={to="wrappedLineFirstNonWhitespaceCharacter"}}, "modalkeys.enterInsert", "modalkeys.reset"]
+
+[[bind.edit.action.basic.items]]
+key = 'o'
+mode = 'normal'
+do = ["editor.action.insertLineAfter", "modalkeys.enterInsert"]
+when = "editorTextFocus"
+
+[[bind.edit.action.basic.items]]
+key = 'shift+o'
+mode = 'normal'
+do = ["editor.action.insertLineBefore", "modalkeys.enterInsert"]
+when = "editorTextFocus"

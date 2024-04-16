@@ -31,9 +31,11 @@ do = ["selection-utilities.shrinkToActive", "modalkeys.enterInsert", "modalkeys.
 when = "editorTextFocus"
 
 [[bind.modes.items]]
+name = '$ and insert'
+description = "move cursor to the end of the current line(s) and enter insert mode"
 key = 'shift+a'
 mode = 'normal'
-do = ["selection-utilities.splitByNewline", { command = "cursorMove", args = { to = "wrappedLineEnd", select = false } }, "modalkeys.enterInsert", "modalkeys.reset"]
+do = ['expandLineSelection', 'editor.action.insertCursorAtEndOfEachLineSelected', 'modalkeys.enterInsert', 'modalkeys.reset']
 
 [[bind.modes.items]]
 key = 'shift+i'

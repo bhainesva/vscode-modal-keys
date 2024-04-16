@@ -269,7 +269,8 @@ key = "e"
 name = "subwrd end"
 description = "next subword (camel/snake case) end"
 do.args.unit = "subword"
-do.args.boundary = "end"
+do.computedArgs.boundary = "end"
+do.args.value = 1
 
 [[bind.edit.motion.obj.items]]
 key = "shift+w"

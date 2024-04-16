@@ -186,8 +186,19 @@ export async function parseBindingFileOrDirectory(file: vscode.Uri){
 
     if (stat.type === vscode.FileType.Directory) {
         // TODO: make this recursive
-        const subfiles = await vscode.workspace.fs.readDirectory(file);
-        const fileContents = await Promise.all(subfiles.map(async (subfile) => {
+
+
+        const subfiles = (await vscode.workspace.fs.readDirectory(file)).sort(([a]: [string, vscode.FileType], [b]: [string, vscode.FileType]) => {
+            // TODO: decide on a name for this, support json
+            if (a === 'pre.toml') {
+                return -1;
+            } else if (b === 'pre.toml') {
+                return -1;
+            } else {
+                return a.localeCompare(b);
+            }
+        });
+        const fileContents = await Promise.all(subfiles.map(async (subfile: [string, vscode.FileType]) => {
             const file_data = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(file, subfile[0]));
             const file_text = decoder.decode(file_data);
             if (file.fsPath.endsWith(".json")) {
@@ -197,7 +208,7 @@ export async function parseBindingFileOrDirectory(file: vscode.Uri){
             }
         }));
 
-        return bindingSpec.safeParse(fileContents.reduce((allBindings, sub_config) => merge(allBindings, sub_config), {}));
+        return bindingSpec.safeParse(fileContents.reduce((allBindings: any, sub_config: any) => merge(allBindings, sub_config), {}));
     }
     
     let file_data = await vscode.workspace.fs.readFile(file);

@@ -25,16 +25,6 @@ when = "suggestWidgetVisible && textInputFocus"
 do = ["modalkeys.enterNormal", "modalkeys.reset"]
 
 [[bind.modes.items]]
-# by default typing keys in a mode other than insert is simply ignored
-name = "ignore"
-description = "this key does nothing"
-key = ["<all-keys>", "shift+<all-keys>"]
-do.command = "modalkeys.ignore"
-allowed_prefixes = "<all-prefixes>"
-mode = ["!insert", "!search"]
-when = "editorTextFocus && !findWidgetVisible"
-
-[[bind.modes.items]]
 key = "i"
 mode = ["normal"]
 do = ["selection-utilities.shrinkToActive", "modalkeys.enterInsert", "modalkeys.reset"]

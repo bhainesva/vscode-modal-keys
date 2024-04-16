@@ -1,0 +1,42 @@
+[header]
+version = "1.0"
+required_extensions = [
+    "dbankier.vscode-quick-select",
+    "haberdashPI.vscode-select-by-indent",
+    "haberdashPI.selection-utilities",
+    "haberdashPI.move-cursor-by-argument",
+    "pustelto.bracketeer",
+    "wmaurer.change-case",
+    "pranshuagrawal.toggle-case",
+    "albymor.increment-selection",
+    "pkief.markdown-checkbox",
+    "edgardmessias.clipboard-manager",
+    "stkb.rewrap",
+    "haberdashPI.terminal-polyglot",
+    "jack89ita.open-file-from-path",
+    "koalamer.labeled-bookmarks",
+]
+
+[bind]
+name = "Ben's Key Bindings"
+
+description = """
+Keybindings for Ben :)
+"""
+
+[bind.fffaults]
+name = "Defaults"
+description = """
+These keybinds are applied first and will be overridden by any binds found in other
+config files.
+"""
+
+[[bind.fffaults.items]]
+# by default typing keys in a mode other than insert is simply ignored
+name = "ignore"
+description = "this key does nothing"
+key = ["<all-keys>", "shift+<all-keys>"]
+do.command = "modalkeys.ignore"
+allowed_prefixes = "<all-prefixes>"
+mode = ["!insert", "!search"]
+when = "editorTextFocus && !findWidgetVisible"

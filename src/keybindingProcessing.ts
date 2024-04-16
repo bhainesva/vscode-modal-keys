@@ -157,7 +157,7 @@ function itemToConfigBinding(item: StrictBindingItem): IConfigKeyBinding {
 function validateUniqueForBinding(vals: (string | undefined)[], name: string, item: any): string | undefined {
     let uvals = uniq(vals.filter(v => v !== undefined));
     if(uvals.length > 1){
-        vscode.window.showErrorMessage(`Multiple values of \`${name}\` for idenictal 
+        vscode.window.showErrorMessage(`Multiple values of \`${name}\` for identical 
             binding \`${item.key}\` in mode "${item.mode.join(' or ')}". Update the bindings file
             to use only one name for this binding regardless of its \`when\` clause
             You can also safely leave all but one of these bindings with a \`${name}\`

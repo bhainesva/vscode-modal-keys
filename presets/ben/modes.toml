@@ -40,7 +40,7 @@ do = ['expandLineSelection', 'editor.action.insertCursorAtEndOfEachLineSelected'
 [[bind.modes.items]]
 key = 'shift+i'
 mode = 'normal'
-do = [ { command = "cursorMove", args = { to = "wrappedLineStart", select = false } }, "modalkeys.enterInsert", "modalkeys.reset"]
+do = ['expandLineSelection', 'editor.action.insertCursorAtEndOfEachLineSelected', {command="cursorMove", args={to="wrappedLineFirstNonWhitespaceCharacter"}}, "modalkeys.enterInsert", "modalkeys.reset"]
 
 [[bind.modes.items]]
 key = 'o'

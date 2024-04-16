@@ -10,7 +10,7 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
-				"--profile-temp",
+				"--profile=vscode-modal-keys-debug",
 				"--install-extension haberdashPI.selection-utilities",
 				"--extensionDevelopmentPath=${workspaceFolder}",
 			],

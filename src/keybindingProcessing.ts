@@ -245,12 +245,13 @@ function moveModeToWhenClause(binding: StrictBindingItem){
 
 function expandAllowedPrefixes(when: string[], item: BindingItem){
     if(Array.isArray(item.allowed_prefixes)){
-        let allowed = item.allowed_prefixes.map(a => `modalkeys.prefix == '${a}'`).join(' || ');
+        let allowed = item.allowed_prefixes.map(a => a.includes("'") ? `modalkeys.prefix =~ /^${a.replace('+', '\\+')}$/` : `modalkeys.prefix == '${a}'`).join(' || ');
         when.push(allowed);
     }
-    if(item.allowed_prefixes !== "<all-prefixes>"){
-        when.push("modalkeys.prefix == ''");
-    }
+    // TODO: I don't know what this is doing, it feels wrong to me
+    // if(item.allowed_prefixes !== "<all-prefixes>"){
+    //     when.push("modalkeys.prefix == ''");
+    // }
     return when;
 }
 
@@ -285,7 +286,7 @@ function extractPrefixBindings(item: StrictBindingItem, prefixItems: BindingMap 
                 resetTransient: false
             }; 
             // we parse the `when` expression so that there is a better chance
-            // that equivalent conditiosn hash to the same value
+            // that equivalent conditions hash to the same value
             let parsedWhen = expandedWhen.map(jsep);
             let prefixKey = hash({key, mode: item.mode, when: parsedWhen});
             prefixItems[prefixKey] = prefixItem;

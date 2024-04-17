@@ -164,28 +164,25 @@ export function setKeyContext(args: SetArgs){
 commands['modalkeys.set'] = setCmd;
 commands['modalkeys.setMode'] = (x) => setKeyContext({name: 'mode', value: 'insert', transient: false});
 commands['modalkeys.enterInsert'] = (x) => {
-    const colorCustomizations: any = vscode.workspace.getConfiguration().get('workbench.colorCustomizations');
-    colorCustomizations['editorCursor.foreground'] = '#ddbb88';
-    vscode.workspace.getConfiguration()
-    .update(
-        'workbench.colorCustomizations',
-         colorCustomizations,
-    );
-
     setKeyContext({name: 'mode', value: 'insert', transient: false});
-}
+};
 
 commands['modalkeys.enterNormal'] = (x) => {
-    const colorCustomizations: any = vscode.workspace.getConfiguration().get('workbench.colorCustomizations');
-    colorCustomizations['editorCursor.foreground'] = '#dd88c2';
-    vscode.workspace.getConfiguration()
-    .update(
-        'workbench.colorCustomizations',
-         colorCustomizations,
-    );
-
     setKeyContext({name: 'mode', value: 'normal', transient: false});
+};
+
+const enterModeArgs = z.object({
+    mode: z.string(),
+});
+type EnterModeArgs = z.infer<typeof enterModeArgs>;
+function enterModeCmd(args_: unknown){
+    let args = validateInput('modalkeys.enterMode', args_, enterModeArgs);
+    if(args){ enterMode(args); }
 }
+export function enterMode(args: EnterModeArgs){
+    setKeyContext({name: 'mode', value: args.mode, transient: false});
+}
+commands['modalkeys.enterMode'] = enterModeCmd;
 
 function reset(){
     // clear any relevant state
@@ -224,6 +221,21 @@ export function activate(context: vscode.ExtensionContext) {
     searchStatusBar = vscode.window.createStatusBarItem('search', vscode.StatusBarAlignment.Left);
     searchStatusBar.accessibilityInformation = { label: "Search Text" };
     searchStatusBar.show();
+
+    const outputChannel = vscode.window.createOutputChannel('ModalKeys');
+    outputChannel.show();
+    const logArgs = z.object({
+        value: z.string(),
+    });
+    type LogArgs = z.infer<typeof logArgs>;
+    function logCmd(args_: unknown){
+        let args = validateInput('modalkeys.log', args_, logArgs);
+        if(args){ log(args); }
+    }
+    function log(args: LogArgs){
+        outputChannel.appendLine(args.value);
+    }
+    commands['modalkeys.log'] = logCmd;
 
     updateValidModes();
     vscode.workspace.onDidChangeConfiguration(updateValidModes);

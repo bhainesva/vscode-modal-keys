@@ -23,6 +23,34 @@ name = "Ben's Key Bindings"
 description = """
 Keybindings for Ben :)
 """
+[define]
+validModes = ["insert", "normal", "surround", "search"]
+
+
+[define.symmetric_key_map]
+"shift+;" = ":"
+"shift+'" = "\""
+"shift+/" = "?"
+"shift+\\" = "|"
+"shift+=" = "+"
+"shift+-" = "-"
+"shift+8" = "*"
+"shift+7" = "&"
+"shift+6" = "^"
+"shift+5" = "%"
+"shift+4" = "$"
+"shift+3" = "#"
+"shift+2" = "@"
+"shift+1" = "!"
+"shift+`" = "~"
+";" = ";"
+"'" = "'"
+"," = ","
+"." = "."
+"/" = "/"
+"=" = "="
+"-" = "-"
+"`" = "`"
 
 [bind.fffaults]
 name = "Defaults"

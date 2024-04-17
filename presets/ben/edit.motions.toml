@@ -113,6 +113,7 @@ do = "bracketeer.selectBracketContent"
 
 [[bind.edit.motion.context.items]]
 key = "'"
+allowed_prefixes = [""]
 do = "bracketeer.selectQuotesContent"
 
 [[bind.edit.motion.context.items]]

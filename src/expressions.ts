@@ -33,7 +33,9 @@ export class EvalContext {
 
     evalExpressionsInString(str: string, values: Record<string, any>) {
         let result = "";
-        let r = /\{.*?key.*?\}/g;
+        //TODO: expand check for any key in values
+        // or maybe just check for the {}?
+        let r = /\{.*?(key|prefix).*?\}/g;
         let match = r.exec(str);
         let start_i = 0;
         while (match !== null) {

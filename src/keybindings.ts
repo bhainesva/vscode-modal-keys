@@ -151,7 +151,7 @@ async function importBindings() {
     }
 }
 
-// TODO: we also evenutally want to have a way to customize presets
+// TODO: we also eventually want to have a way to customize presets
 // without having to modify it (for small tweaks)
 // TODO: we want to be able to export a preset to a file
 // TODO: we should be able to delete user defined presets

@@ -80,8 +80,13 @@ when = "editorTextFocus"
 name = "Surround"
 description = "Actions for modifying surrounding characters"
 
+[define.k_to_select_inside_command]
+"'" = "bracketeer.selectQuotesContent"
+"shift+'" = "bracketeer.selectQuotesContent"
+"[" = "bracketeer.selectBracketContent"
+
 [[bind.edit.action.surround.items]]
-name = 'Enter surround mode'
+name = "Enter surround mode"
 description = "change surrounding characters"
 when = "!editorHasSelection"
 key = "c s"
@@ -90,39 +95,25 @@ do.command = "modalkeys.enterMode"
 do.args.mode = "surround"
 
 [[bind.edit.action.surround.items]]
-name = 'change surround'
+name = "change surround"
 description = "change surround"
-mode = ['surround']
-key = ["'", "shift+'"]
+mode = ["surround"]
+key = ["'", "shift+'", "["]
 allowed_prefixes = ['']
-resetTransient = false
 do = [
-  {command = 'modalkeys.prefix', args = { key ="{key}"}},
-  {command = 'modalkeys.log', args = { value = "printing from log"}},
+  {command = 'modalkeys.prefix', args = { key = "{key}"}},
 ]
+resetTransient = false
 
 [[bind.edit.action.surround.items]]
 name = "change surround"
 description = "change surround"
-key = ["'", "shift+'"]
 mode = ['surround']
-allowed_prefixes = ["'", "shift+'"]
+key = ["'", "shift+'"]
+allowed_prefixes = ["'", "shift+'", "["]
 do = [
-  "bracketeer.selectQuotesContent", 
+  "{k_to_select_inside_command[prefix]}", 
   { command = 'selection-utilities.deleteAround', args = { count = 1}},
   { command = 'selection-utilities.insertAround', args = {before = '{symmetric_key_map[key]}', after = '{symmetric_key_map[key]}'}},
   "modalkeys.enterNormal",
 ]
-
-# [[bind.edit.action.surround.items]]
-# name = "change to double quotes"
-# description = "change to double quotes"
-# mode = ['surround']
-# key = ["'", "shift+'"]
-# allowed_prefixes = ["'", "shift+'"]
-# do = [
-#   "bracketeer.selectQuotesContent", 
-#   { command = 'selection-utilities.deleteAround', args = { count = 1}},
-#   { command = 'selection-utilities.insertAround', args = {before = '{symmetric_key_map[key]}', after = '{symmetric_key_map[key]}'}},
-#   "modalkeys.enterNormal",
-# ]

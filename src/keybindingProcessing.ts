@@ -14,7 +14,7 @@ export function processBindings(spec: BindingSpec){
     items = expandBindingDocsAcrossWhenClauses(items);
     items = items.map(moveModeToWhenClause);
     let prefixItems: BindingMap = {};
-    items = items.map(i => extractPrefixBindings(i, prefixItems));
+    items = items.flatMap(i => extractPrefixBindings(i, prefixItems, spec));
     let bindings = items.map(itemToConfigBinding);
     let prefixBindings = values(prefixItems).map(itemToConfigBinding);
     return bindings.concat(prefixBindings);
@@ -97,9 +97,9 @@ function expandBindingKey(k: string, item: StrictBindingItem, context: EvalConte
                 expandBindingKey(k, item, context, definitions));
         }
     }
-    let keyEvaled = reifyStrings(omit(item, 'key'), 
-        str => context.evalExpressionsInString(str, {...definitions, key: k}));
-    return [{...keyEvaled, key: k}];
+    // let keyEvaled = reifyStrings(omit(item, 'key'), 
+    //     str => context.evalExpressionsInString(str, {...definitions, key: k}));
+    return [{...item, key: k}];
 }
 
 const ALL_KEYS = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./";
@@ -248,10 +248,9 @@ function expandAllowedPrefixes(when: string[], item: BindingItem){
         let allowed = item.allowed_prefixes.map(a => a.includes("'") ? `modalkeys.prefix =~ /^${a.replace('+', '\\+')}$/` : `modalkeys.prefix == '${a}'`).join(' || ');
         when.push(allowed);
     }
-    // TODO: I don't know what this is doing, it feels wrong to me
-    // if(item.allowed_prefixes !== "<all-prefixes>"){
-    //     when.push("modalkeys.prefix == ''");
-    // }
+    else if(item.allowed_prefixes !== "<all-prefixes>"){
+        when.push("modalkeys.prefix == ''");
+    }
     return when;
 }
 
@@ -261,12 +260,12 @@ function expandWhenPrefixes(when_: string[] | string | undefined, prefix: string
     let when = when_ ? (Array.isArray(when_) ? when_ : [when_]) : [];
     when = cloneDeep(when);
     if(prefix === ""){ when = expandAllowedPrefixes(when, item);
-    }else{ when.push(`(modalkeys.prefix == '${prefix}')`); }
+    }else{ when.push((!prefix.includes("'")) ? `(modalkeys.prefix == '${prefix}')` : `(modalkeys.prefix =~ /^${prefix.replace('+', '\\+')}$/)`); }
     return when;
 }
 
 type BindingMap = { [key: string]: StrictBindingItem };
-function extractPrefixBindings(item: StrictBindingItem, prefixItems: BindingMap = {}): StrictBindingItem{
+function extractPrefixBindings(item: StrictBindingItem, prefixItems: BindingMap = {}, spec: any): StrictBindingItem[] {
     let prefix = "";
 
     if(item.key !== undefined && !Array.isArray(item.key)){
@@ -291,12 +290,44 @@ function extractPrefixBindings(item: StrictBindingItem, prefixItems: BindingMap 
             let prefixKey = hash({key, mode: item.mode, when: parsedWhen});
             prefixItems[prefixKey] = prefixItem;
         }
-
-        return {
-            ...item, 
-            when: expandWhenPrefixes(item.when, prefix, item), 
-            key: key_seq[key_seq.length-1]
-        };
+        
+        if (prefix || !item.allowed_prefixes || typeof item.allowed_prefixes === 'string') {
+            return[{
+                ...item,
+                when: expandWhenPrefixes(item.when, prefix, item), 
+                key: key_seq[key_seq.length-1]
+            }];
+        }
+        let context = new EvalContext();
+        return item.allowed_prefixes.map((pref: string) => {
+            let values = {...spec.define, key: item.key, prefix: pref};
+            let keyEvaled = reifyStrings(omit(item, 'key'),
+            str => context.evalExpressionsInString(str, values));
+            return {
+               ...keyEvaled,
+               key: item.key,
+               when: expandWhenPrefixes(item.when, pref, item),
+            };
+        });
     }
-    return item;
+
+    let context = new EvalContext();
+    let values = {...spec.define, key: item.key};
+    if (Array.isArray(item.allowed_prefixes)) {
+        return item.allowed_prefixes.map(pref => {
+            const newValues = {...values, prefix: pref}
+            let keyEvaled = reifyStrings(omit(item, 'key'),
+            str => context.evalExpressionsInString(str, newValues));
+            return {
+               ...keyEvaled,
+               key: item.key,
+            };
+        });
+    } else {
+        const newValues = {...values, prefix: ""}
+        let keyEvaled = reifyStrings(omit(item, 'key'), 
+        str => context.evalExpressionsInString(str, newValues));
+    
+        return [{...keyEvaled, key: item.key}];
+    }
 }

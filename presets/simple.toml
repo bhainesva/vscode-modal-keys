@@ -51,10 +51,10 @@ validModes = ["insert", "normal", "surround", "search"]
 "-" = "-"
 "`" = "`"
 
-[define.key_to_select_inside_command]
+[define.k_to_select_inside_command]
 "'" = "bracketeer.selectQuotesContent"
 "shift+'" = "bracketeer.selectQuotesContent"
-"x" = "bracketeer.selectBracketContent"
+"[" = "bracketeer.selectBracketContent"
 
 [bind.fffaults]
 name = "Defaults"
@@ -126,10 +126,10 @@ name = "change surround"
 description = "change surround"
 mode = ['surround']
 key = ["'", "shift+'"]
-allowed_prefixes = ["'", "shift+'"]
+allowed_prefixes = ["'", "shift+'", "["]
 do = [
   {command = 'modalkeys.log', args = { value = 'followup'}},
-  "{key_to_select_inside_command[prefix]}", 
+  "{k_to_select_inside_command[prefix]}", 
   { command = 'selection-utilities.deleteAround', args = { count = 1}},
   { command = 'selection-utilities.insertAround', args = {before = '{symmetric_key_map[key]}', after = '{symmetric_key_map[key]}'}},
   "modalkeys.enterNormal",
